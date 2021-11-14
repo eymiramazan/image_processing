@@ -21,15 +21,25 @@ class Window(QMainWindow):
         self.update()
 
     def load_image(self):
-        # TODO foto fix size olarak yukleniyor onu ayarlamak lazım
+
         print("load image clicked")
         file_name = QFileDialog.getOpenFileName(self, "Open File")
         image_path = file_name[0]
         pixmap = QPixmap(image_path)
+
         self.image = image_path
-        self.ui.image.setScaledContents(True)
+        self.ui.image.setScaledContents(False)
         self.ui.image.setAlignment(Qt.AlignCenter)
-        self.ui.image.setPixmap(pixmap)
+
+        # Size Problem Fixed
+        w = self.ui.image.width()
+        h = self.ui.image.height()
+        if (pixmap.height() > self.ui.image.height()) or (pixmap.width() > self.ui.image.width()) :
+            # Tum windowa scale etmek icin
+            self.ui.image.setPixmap(pixmap.scaled(w,h,Qt.KeepAspectRatio))
+        else:
+            self.ui.image.setPixmap(pixmap)
+            
         self.ui.image.installEventFilter(self)
 
     def save_image(self):

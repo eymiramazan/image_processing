@@ -17,8 +17,8 @@
    <widget class="QLabel" name="image">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>0</y>
+      <x>40</x>
+      <y>70</y>
       <width>1024</width>
       <height>720</height>
      </rect>
@@ -49,7 +49,7 @@
      <x>0</x>
      <y>0</y>
      <width>1128</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -59,7 +59,37 @@
     <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
    </widget>
+   <widget class="QMenu" name="menuFilters">
+    <property name="title">
+     <string>Filters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHistogram">
+    <property name="title">
+     <string>Histogram</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTransforms">
+    <property name="title">
+     <string>Transforms</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuIntensity">
+    <property name="title">
+     <string>Intensity</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuMorphology">
+    <property name="title">
+     <string>Morphology</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuFilters"/>
+   <addaction name="menuHistogram"/>
+   <addaction name="menuTransforms"/>
+   <addaction name="menuIntensity"/>
+   <addaction name="menuMorphology"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad">
