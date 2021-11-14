@@ -63,6 +63,7 @@
     <property name="title">
      <string>Filters</string>
     </property>
+    <addaction name="actionFarid"/>
    </widget>
    <widget class="QMenu" name="menuHistogram">
     <property name="title">
@@ -100,6 +101,11 @@
   <action name="actionSave">
    <property name="text">
     <string>Save As</string>
+   </property>
+  </action>
+  <action name="actionFarid">
+   <property name="text">
+    <string>Farid</string>
    </property>
   </action>
  </widget>

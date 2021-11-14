@@ -45,8 +45,11 @@ class Ui_Image(object):
         self.actionLoad.setObjectName("actionLoad")
         self.actionSave = QtWidgets.QAction(Image)
         self.actionSave.setObjectName("actionSave")
+        self.actionFarid = QtWidgets.QAction(Image)
+        self.actionFarid.setObjectName("actionFarid")
         self.menuFile.addAction(self.actionLoad)
         self.menuFile.addAction(self.actionSave)
+        self.menuFilters.addAction(self.actionFarid)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuFilters.menuAction())
         self.menubar.addAction(self.menuHistogram.menuAction())
@@ -69,6 +72,7 @@ class Ui_Image(object):
         self.menuMorphology.setTitle(_translate("Image", "Morphology"))
         self.actionLoad.setText(_translate("Image", "Load"))
         self.actionSave.setText(_translate("Image", "Save As"))
+        self.actionFarid.setText(_translate("Image", "Farid"))
 
 
 if __name__ == "__main__":
