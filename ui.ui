@@ -49,7 +49,7 @@
      <x>0</x>
      <y>0</y>
      <width>1128</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -64,6 +64,15 @@
      <string>Filters</string>
     </property>
     <addaction name="actionFarid"/>
+    <addaction name="actionGabor"/>
+    <addaction name="actionFrangi"/>
+    <addaction name="actionGaussian"/>
+    <addaction name="actionHessian"/>
+    <addaction name="actionMedian"/>
+    <addaction name="actionMeijering"/>
+    <addaction name="actionRoberts"/>
+    <addaction name="actionSato"/>
+    <addaction name="actionScharr"/>
    </widget>
    <widget class="QMenu" name="menuHistogram">
     <property name="title">
@@ -106,6 +115,56 @@
   <action name="actionFarid">
    <property name="text">
     <string>Farid</string>
+   </property>
+  </action>
+  <action name="actionGabor">
+   <property name="text">
+    <string>Gabor</string>
+   </property>
+  </action>
+  <action name="actionFrangi">
+   <property name="text">
+    <string>Frangi</string>
+   </property>
+  </action>
+  <action name="actionGaussian">
+   <property name="text">
+    <string>Gaussian</string>
+   </property>
+  </action>
+  <action name="actionHessian">
+   <property name="text">
+    <string>Hessian</string>
+   </property>
+  </action>
+  <action name="actionMedian">
+   <property name="text">
+    <string>Median</string>
+   </property>
+  </action>
+  <action name="actionMeijering">
+   <property name="text">
+    <string>Meijering</string>
+   </property>
+  </action>
+  <action name="actionRoberts">
+   <property name="text">
+    <string>Roberts</string>
+   </property>
+  </action>
+  <action name="actionScharr">
+   <property name="text">
+    <string>Scharr</string>
+   </property>
+  </action>
+  <action name="actionMean">
+   <property name="text">
+    <string>Sato</string>
+   </property>
+  </action>
+  <action name="actionSato">
+   <property name="text">
+    <string>Sato</string>
    </property>
   </action>
  </widget>
