@@ -78,6 +78,8 @@
     <property name="title">
      <string>Histogram</string>
     </property>
+    <addaction name="actionShow_Histogram"/>
+    <addaction name="actionEqualize_Histogram"/>
    </widget>
    <widget class="QMenu" name="menuTransforms">
     <property name="title">
@@ -165,6 +167,16 @@
   <action name="actionSato">
    <property name="text">
     <string>Sato</string>
+   </property>
+  </action>
+  <action name="actionShow_Histogram">
+   <property name="text">
+    <string>Show Histogram</string>
+   </property>
+  </action>
+  <action name="actionEqualize_Histogram">
+   <property name="text">
+    <string>Equalize Histogram</string>
    </property>
   </action>
  </widget>

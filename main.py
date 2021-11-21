@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 
 from PIL import ImageQt, Image
 
-from skimage import io, filters, color
+from skimage import io, filters, color, exposure, img_as_float
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -84,11 +84,7 @@ class Window(QMainWindow):
         self.ui.actionRoberts.triggered.connect(self.roberts_filter)
         self.ui.actionScharr.triggered.connect(self.scharr_filter)
         self.ui.actionSato.triggered.connect(self.sato_filter)
-
-    # def button_clicked(self):
-    #     print("clicked!")
-    #     self.ui.label.setText("deneme")
-    #     self.update()
+        self.ui.actionShow_Histogram.triggered.connect(self.show_histogram)
 
     def load_image(self):
 
@@ -166,6 +162,21 @@ class Window(QMainWindow):
     def sato_filter(self):
         result = filters.sato(rgb2gray(Image_), mode="constant")
         self.open_result_window(result)
+
+    # Histograms
+    def show_histogram(self):
+        # based on the example histogram from the skimage website
+        histogram, bin_edges = np.histogram(
+            rgb2gray(Image_), bins=256, range=(0, 1))
+
+        plt.figure()
+        plt.title("Grayscale Histogram")
+        plt.xlabel("grayscale value")
+        plt.ylabel("pixels")
+        plt.xlim([0.0, 1.0])  # <- named arguments do not work here
+
+        plt.plot(bin_edges[0:-1], histogram)  # <- or here
+        plt.show()
 
 
 def window():
