@@ -5,6 +5,7 @@ import numpy as np
 from PyQt5.QtGui import *
 from skimage.color.adapt_rgb import adapt_rgb, each_channel
 from skimage.color.colorconv import rgb2gray
+from skimage.util.dtype import img_as_float, img_as_ubyte
 from mainUi import Ui_Image
 from resultUi import Ui_ResultImage
 from PyQt5.QtWidgets import *
@@ -12,7 +13,7 @@ from PyQt5.QtCore import *
 
 from PIL import ImageQt, Image
 
-from skimage import io, filters, color
+from skimage import io, filters, color, exposure, data
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -31,6 +32,7 @@ class ResultWindow(QMainWindow):
     def __init__(self, result):
         super().__init__()
         self.ui = Ui_ResultImage()
+        self.result = result
         self.init_ui()
         self.show_result_image(result)
 
@@ -54,10 +56,13 @@ class ResultWindow(QMainWindow):
 
         self.show()
 
+    # TODO fix save result image
     def save_result_image(self):
-        image = ImageQt.fromqpixmap(self.ui.resImage.pixmap())
+        # image = ImageQt.fromqpixmap(self.ui.resImage.pixmap())
+        img = self.result.astype(np.uint8)
+        image = Image.fromarray(img)
         file_path = QFileDialog.getSaveFileName(self, "Save File", "", "*.jpg")
-        image.save(file_path[0] + file_path[1][1:])
+        image.save(file_path[0])
 
 
 class Window(QMainWindow):
@@ -84,11 +89,9 @@ class Window(QMainWindow):
         self.ui.actionRoberts.triggered.connect(self.roberts_filter)
         self.ui.actionScharr.triggered.connect(self.scharr_filter)
         self.ui.actionSato.triggered.connect(self.sato_filter)
-
-    # def button_clicked(self):
-    #     print("clicked!")
-    #     self.ui.label.setText("deneme")
-    #     self.update()
+        self.ui.actionShow_Histogram.triggered.connect(self.show_histogram)
+        self.ui.actionEqualize_Histogram.triggered.connect(
+            self.equalize_histogram)
 
     def load_image(self):
 
@@ -166,6 +169,27 @@ class Window(QMainWindow):
     def sato_filter(self):
         result = filters.sato(rgb2gray(Image_), mode="constant")
         self.open_result_window(result)
+
+    # Histograms
+    def show_histogram(self):
+        # example from -> https://scikit-image.org/docs/stable/auto_examples/applications/plot_rank_filters.html#sphx-glr-auto-examples-applications-plot-rank-filters-py
+        # noisy_image = img_as_ubyte(data.camera()) -> works right here
+        noisy_image = img_as_ubyte(Image_)
+        hist, hist_centers = exposure.histogram(noisy_image)
+        plt.figure()
+        plt.title("histogram")
+        plt.plot(hist_centers, hist, lw=2)
+        plt.show()
+
+    def equalize_histogram(self):
+        image = img_as_ubyte(Image_)
+        image_equalized = exposure.equalize_hist(image) * 255
+        hist = np.histogram(image_equalized, bins=np.arange(0, 256))
+        a = plt.figure()
+        plt.title("histogram")
+        plt.plot(hist[1][:-1], hist[0], lw=2)
+        # plt.show()
+        self.open_result_window(a)
 
 
 def window():
