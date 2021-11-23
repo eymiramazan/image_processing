@@ -1,7 +1,11 @@
 import os
+from pathlib import PosixPath
+import time
 import re
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.backends.backend_qt5 import FigureCanvasQT
 import numpy as np
-
+import warnings
 from PyQt5.QtGui import *
 from skimage.color.adapt_rgb import adapt_rgb, each_channel
 from skimage.color.colorconv import rgb2gray
@@ -17,7 +21,7 @@ from skimage import io, filters, color, exposure, data
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, SubplotParams
 
 
 # For matplotlib into result window
@@ -25,49 +29,16 @@ class MplCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
+        self.axes.set_axis_off()
         super(MplCanvas, self).__init__(fig)
-
-
-class ResultWindow(QMainWindow):
-    def __init__(self, result):
-        super().__init__()
-        self.ui = Ui_ResultImage()
-        self.result = result
-        self.init_ui()
-        self.show_result_image(result)
-
-    def init_ui(self):
-        self.ui.setupUi(self)
-        self.ui.actionSave_Photo.triggered.connect(self.save_result_image)
-
-    def show_result_image(self, result):
-        sc = MplCanvas(self, width=5, height=4, dpi=100)
-        sc.axes.imshow(result)
-
-        toolbar = NavigationToolbar(sc, self)
-
-        layout = QVBoxLayout()
-        layout.addWidget(toolbar)
-        layout.addWidget(sc)
-
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
-
-        self.show()
-
-    # TODO fix save result image
-    def save_result_image(self):
-        # image = ImageQt.fromqpixmap(self.ui.resImage.pixmap())
-        img = self.result.astype(np.uint8)
-        image = Image.fromarray(img)
-        file_path = QFileDialog.getSaveFileName(self, "Save File", "", "*.jpg")
-        image.save(file_path[0])
 
 
 class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
+        warnings.filterwarnings("ignore")
+        self.Processed_ = None
+        self.Image_ = None
         self.ui = Ui_Image()
         self.init_ui()
 
@@ -97,14 +68,13 @@ class Window(QMainWindow):
 
         print("load image clicked")
         file_name = QFileDialog.getOpenFileName(self, "Open File")
-        image_path = file_name[0]
-        pixmap = QPixmap(image_path)
+        self.Image_path = file_name[0]
+        pixmap = QPixmap(self.Image_path)
 
-        global Image_
+        self.Image_ = io.imread(self.Image_path)
+        self.Processed_ = self.Image_
 
-        Image_ = io.imread(image_path)
-
-        # self.image = image_path
+        # self.image = self.Image_path
         self.ui.image.setScaledContents(False)
         self.ui.image.setAlignment(Qt.AlignCenter)
 
@@ -120,61 +90,90 @@ class Window(QMainWindow):
         self.ui.image.installEventFilter(self)
 
     # fix save image
+
     def save_image(self):
         imageqt = ImageQt.fromqpixmap(self.ui.image.pixmap())
         file_path = QFileDialog.getSaveFileName(self, "Save File", "", "*.jpg")
         imageqt.save(file_path[0] + file_path[1][1:])
 
-    def open_result_window(self, result):
-        self.resWind = ResultWindow(result)
-        self.resWind.show()
+    def show_image(self, result):
+        self.ui.image.setScaledContents(False)
+        self.ui.image.setAlignment(Qt.AlignCenter)
+
+        canvas = MplCanvas(self, width=8, height=6, dpi=100)
+        canvas.axes.imshow(result)
+        canvas.draw()
+        size = canvas.size()
+        width, height = size.width(), size.height()
+        img = QImage(canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
+        pixmap = QPixmap(img)
+        w = self.ui.image.width()
+        h = self.ui.image.height()
+        if (pixmap.height() > self.ui.image.height()) or (pixmap.width() > self.ui.image.width()):
+            # Tum windowa scale etmek icin
+            self.ui.image.setPixmap(pixmap.scaled(w, h, Qt.KeepAspectRatio))
+        else:
+            self.ui.image.setPixmap(pixmap)
+
+        self.ui.image.installEventFilter(self)
 
     # Filters
     def farid_image(self):
-        result = filters.farid(rgb2gray(Image_))
-        self.open_result_window(result)
+        result = filters.farid(rgb2gray(self.Processed_))
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def gabor_filter(self):
-        result, real = filters.gabor(rgb2gray(Image_), frequency=0.6)
-        self.open_result_window(result)
+        result, real = filters.gabor(rgb2gray(self.Processed_), frequency=0.6)
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def frangi_filter(self):
-        result = filters.frangi(rgb2gray(Image_), mode="constant")
-        self.open_result_window(result)
+        result = filters.frangi(rgb2gray(self.Processed_), mode="constant")
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def gaussian_filter(self):
-        result = filters.gaussian(rgb2gray(Image_), sigma=3.5)
-        self.open_result_window(result)
+        result = filters.gaussian(rgb2gray(self.Processed_), sigma=3.5)
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def hessian_filter(self):
-        result = filters.hessian(rgb2gray(Image_), mode="constant")
-        self.open_result_window(result)
+        result = filters.hessian(rgb2gray(self.Processed_), mode="constant")
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def median_filter(self):
-        result = filters.median(rgb2gray(Image_))
-        self.open_result_window(result)
+        result = filters.median(rgb2gray(self.Processed_))
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def meijering_filter(self):
-        result = filters.meijering(rgb2gray(Image_))
-        self.open_result_window(result)
+        result = filters.meijering(rgb2gray(self.Processed_))
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def roberts_filter(self):
-        result = filters.roberts(rgb2gray(Image_))
-        self.open_result_window(result)
+        result = filters.roberts(rgb2gray(self.Processed_))
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def scharr_filter(self):
-        result = filters.scharr(rgb2gray(Image_))
-        self.open_result_window(result)
+        result = filters.scharr(rgb2gray(self.Processed_))
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     def sato_filter(self):
-        result = filters.sato(rgb2gray(Image_), mode="constant")
-        self.open_result_window(result)
+        result = filters.sato(rgb2gray(self.Processed_), mode="constant")
+        self.Processed_ = result
+        self.show_image(self.Processed_)
 
     # Histograms
+
     def show_histogram(self):
         # example from -> https://scikit-image.org/docs/stable/auto_examples/applications/plot_rank_filters.html#sphx-glr-auto-examples-applications-plot-rank-filters-py
         # noisy_image = img_as_ubyte(data.camera()) -> works right here
-        noisy_image = img_as_ubyte(Image_)
+        noisy_image = img_as_ubyte(self.Image_)
         hist, hist_centers = exposure.histogram(noisy_image)
         plt.figure()
         plt.title("histogram")
@@ -182,14 +181,14 @@ class Window(QMainWindow):
         plt.show()
 
     def equalize_histogram(self):
-        image = img_as_ubyte(Image_)
-        image_equalized = exposure.equalize_hist(image) * 255
-        hist = np.histogram(image_equalized, bins=np.arange(0, 256))
+        image = img_as_ubyte(self.Image_)
+        self.Image_equalized = exposure.equalize_hist(image) * 255
+        hist = np.histogram(self.Image_equalized, bins=np.arange(0, 256))
         a = plt.figure()
         plt.title("histogram")
         plt.plot(hist[1][:-1], hist[0], lw=2)
-        # plt.show()
-        self.open_result_window(a)
+        plt.show()
+        # self.open_result_window(a)
 
 
 def window():
