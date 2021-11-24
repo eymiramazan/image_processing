@@ -42,6 +42,19 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="resetImage">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset Image</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -85,6 +98,11 @@
     <property name="title">
      <string>Transforms</string>
     </property>
+    <addaction name="actionResizing"/>
+    <addaction name="actionRotation"/>
+    <addaction name="actionCropping"/>
+    <addaction name="actionSwirl"/>
+    <addaction name="actionPyramid_Reduce"/>
    </widget>
    <widget class="QMenu" name="menuIntensity">
     <property name="title">
@@ -95,6 +113,16 @@
     <property name="title">
      <string>Morphology</string>
     </property>
+    <addaction name="actionErosion"/>
+    <addaction name="actionDilation"/>
+    <addaction name="actionOpening"/>
+    <addaction name="actionClosing"/>
+    <addaction name="actionMorphological_Gradient"/>
+    <addaction name="actionTop_Hat"/>
+    <addaction name="actionBlack_Hat"/>
+    <addaction name="actionSquare"/>
+    <addaction name="actionSkeletonize"/>
+    <addaction name="actionFloodFill"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuFilters"/>
@@ -177,6 +205,81 @@
   <action name="actionEqualize_Histogram">
    <property name="text">
     <string>Equalize Histogram</string>
+   </property>
+  </action>
+  <action name="actionResizing">
+   <property name="text">
+    <string>Resizing</string>
+   </property>
+  </action>
+  <action name="actionRotation">
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionCropping">
+   <property name="text">
+    <string>Cropping</string>
+   </property>
+  </action>
+  <action name="actionSwirl">
+   <property name="text">
+    <string>Swirl</string>
+   </property>
+  </action>
+  <action name="actionPyramid_Reduce">
+   <property name="text">
+    <string>Pyramid Reduce</string>
+   </property>
+  </action>
+  <action name="actionErosion">
+   <property name="text">
+    <string>Erosion</string>
+   </property>
+  </action>
+  <action name="actionDilation">
+   <property name="text">
+    <string>Dilation</string>
+   </property>
+  </action>
+  <action name="actionOpening">
+   <property name="text">
+    <string>Opening</string>
+   </property>
+  </action>
+  <action name="actionClosing">
+   <property name="text">
+    <string>Closing</string>
+   </property>
+  </action>
+  <action name="actionMorphological_Gradient">
+   <property name="text">
+    <string>Morphological Gradient</string>
+   </property>
+  </action>
+  <action name="actionTop_Hat">
+   <property name="text">
+    <string>Top Hat</string>
+   </property>
+  </action>
+  <action name="actionBlack_Hat">
+   <property name="text">
+    <string>Black Hat</string>
+   </property>
+  </action>
+  <action name="actionSquare">
+   <property name="text">
+    <string>Square</string>
+   </property>
+  </action>
+  <action name="actionSkeletonize">
+   <property name="text">
+    <string>Skeletonize</string>
+   </property>
+  </action>
+  <action name="actionFloodFill">
+   <property name="text">
+    <string>FloodFill</string>
    </property>
   </action>
  </widget>
