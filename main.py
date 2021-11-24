@@ -11,13 +11,12 @@ from skimage.color.adapt_rgb import adapt_rgb, each_channel
 from skimage.color.colorconv import rgb2gray
 from skimage.util.dtype import img_as_float, img_as_ubyte
 from mainUi import Ui_Image
-from resultUi import Ui_ResultImage
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from PIL import ImageQt, Image
 
-from skimage import io, filters, color, exposure, data
+from skimage import io, filters, color, exposure, data, transform
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
@@ -63,6 +62,11 @@ class Window(QMainWindow):
         self.ui.actionShow_Histogram.triggered.connect(self.show_histogram)
         self.ui.actionEqualize_Histogram.triggered.connect(
             self.equalize_histogram)
+        self.ui.actionResizing.triggered.connect(self.resize_image)
+        self.ui.actionRotation.triggered.connect(self.rotate)
+        self.ui.actionCropping.triggered.connect(self.crop)
+        self.ui.actionSwirl.triggered.connect(self.swirl_image)
+        # self.ui.actionPyramid_Reduce.triggered.connnect(self.pyramid_reduce)
 
     def load_image(self):
 
@@ -100,22 +104,29 @@ class Window(QMainWindow):
         self.ui.image.setScaledContents(False)
         self.ui.image.setAlignment(Qt.AlignCenter)
 
-        canvas = MplCanvas(self, width=8, height=6, dpi=100)
-        canvas.axes.imshow(result)
-        canvas.draw()
-        size = canvas.size()
-        width, height = size.width(), size.height()
-        img = QImage(canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
-        pixmap = QPixmap(img)
-        w = self.ui.image.width()
-        h = self.ui.image.height()
-        if (pixmap.height() > self.ui.image.height()) or (pixmap.width() > self.ui.image.width()):
-            # Tum windowa scale etmek icin
-            self.ui.image.setPixmap(pixmap.scaled(w, h, Qt.KeepAspectRatio))
-        else:
-            self.ui.image.setPixmap(pixmap)
-
+        im = Image.fromarray(result)
+        data = im.tostring('raw', 'RGBA')
+        image = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
+        pix = QPixmap.fromImage(image)
+        self.ui.image.setPixmap(pix)
         self.ui.image.installEventFilter(self)
+
+        # canvas = MplCanvas(self, width=8, height=6, dpi=100)
+        # canvas.axes.imshow(result)
+        # canvas.draw()
+        # size = canvas.size()
+        # width, height = size.width(), size.height()
+        # img = QImage(canvas.buffer_rgba(), width, height, QImage.Format_RGB32)
+        # pixmap = QPixmap(img)
+        # w = self.ui.image.width()
+        # h = self.ui.image.height()
+        # if (pixmap.height() > self.ui.image.height()) or (pixmap.width() > self.ui.image.width()):
+        #     # Tum windowa scale etmek icin
+        #     self.ui.image.setPixmap(pixmap.scaled(w, h, Qt.KeepAspectRatio))
+        # else:
+        #     self.ui.image.setPixmap(pixmap)
+
+        # self.ui.image.installEventFilter(self)
 
     # Filters
     def farid_image(self):
@@ -169,7 +180,6 @@ class Window(QMainWindow):
         self.show_image(self.Processed_)
 
     # Histograms
-
     def show_histogram(self):
         # example from -> https://scikit-image.org/docs/stable/auto_examples/applications/plot_rank_filters.html#sphx-glr-auto-examples-applications-plot-rank-filters-py
         # noisy_image = img_as_ubyte(data.camera()) -> works right here
@@ -188,7 +198,26 @@ class Window(QMainWindow):
         plt.title("histogram")
         plt.plot(hist[1][:-1], hist[0], lw=2)
         plt.show()
-        # self.open_result_window(a)
+
+    # Transforms
+    def resize_image(self):
+        result = transform.resize(self.Processed_, (100, 100))
+        self.Processed_ = result
+        self.show_image(result)
+
+    def rotate(self):
+        result = transform.rotate(self.Processed_, 2)
+        self.Processed_ = result
+        self.show_image(self.Processed_)
+
+    def crop(self):
+        self.Processed_ = self.Processed_[144:358, 620:801]
+        self.show_image(self.Processed_)
+
+    def swirl_image(self):
+        # result = transform.swirl(self.Processed_)
+        # self.Processed_ = result
+        self.show_image(self.Processed_)
 
 
 def window():

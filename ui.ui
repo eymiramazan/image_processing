@@ -85,6 +85,11 @@
     <property name="title">
      <string>Transforms</string>
     </property>
+    <addaction name="actionResizing"/>
+    <addaction name="actionRotation"/>
+    <addaction name="actionCropping"/>
+    <addaction name="actionSwirl"/>
+    <addaction name="actionPyramid_Reduce"/>
    </widget>
    <widget class="QMenu" name="menuIntensity">
     <property name="title">
@@ -177,6 +182,31 @@
   <action name="actionEqualize_Histogram">
    <property name="text">
     <string>Equalize Histogram</string>
+   </property>
+  </action>
+  <action name="actionResizing">
+   <property name="text">
+    <string>Resizing</string>
+   </property>
+  </action>
+  <action name="actionRotation">
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionCropping">
+   <property name="text">
+    <string>Cropping</string>
+   </property>
+  </action>
+  <action name="actionSwirl">
+   <property name="text">
+    <string>Swirl</string>
+   </property>
+  </action>
+  <action name="actionPyramid_Reduce">
+   <property name="text">
+    <string>Pyramid Reduce</string>
    </property>
   </action>
  </widget>
