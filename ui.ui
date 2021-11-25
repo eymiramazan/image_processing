@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Image Processing</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="image">
@@ -108,6 +108,9 @@
     <property name="title">
      <string>Intensity</string>
     </property>
+    <addaction name="actionNegative"/>
+    <addaction name="actionLogarithmic"/>
+    <addaction name="actionPower_Law"/>
    </widget>
    <widget class="QMenu" name="menuMorphology">
     <property name="title">
@@ -124,12 +127,20 @@
     <addaction name="actionSkeletonize"/>
     <addaction name="actionFloodFill"/>
    </widget>
+   <widget class="QMenu" name="menuVideo_Processing">
+    <property name="title">
+     <string>Video Processing</string>
+    </property>
+    <addaction name="actionWebCam"/>
+    <addaction name="actionVideo"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuFilters"/>
    <addaction name="menuHistogram"/>
    <addaction name="menuTransforms"/>
    <addaction name="menuIntensity"/>
    <addaction name="menuMorphology"/>
+   <addaction name="menuVideo_Processing"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad">
@@ -280,6 +291,31 @@
   <action name="actionFloodFill">
    <property name="text">
     <string>FloodFill</string>
+   </property>
+  </action>
+  <action name="actionNegative">
+   <property name="text">
+    <string>Negative</string>
+   </property>
+  </action>
+  <action name="actionLogarithmic">
+   <property name="text">
+    <string>Logarithmic</string>
+   </property>
+  </action>
+  <action name="actionPower_Law">
+   <property name="text">
+    <string>Power Law</string>
+   </property>
+  </action>
+  <action name="actionWebCam">
+   <property name="text">
+    <string>WebCam</string>
+   </property>
+  </action>
+  <action name="actionVideo">
+   <property name="text">
+    <string>Video</string>
    </property>
   </action>
  </widget>

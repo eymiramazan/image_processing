@@ -72,6 +72,10 @@ class Window(QMainWindow):
         self.ui.actionCropping.triggered.connect(self.crop)
         self.ui.actionSwirl.triggered.connect(self.warp_image)
         self.ui.actionPyramid_Reduce.triggered.connect(self.warp_perspective)
+        # intensity
+        self.ui.actionNegative.triggered.connect(self.negative)
+        self.ui.actionLogarithmic.triggered.connect(self.logarithmic)
+        self.ui.actionPower_Law.triggered.connect(self.powerlaw)
         # morfolojik
         self.ui.actionErosion.triggered.connect(self.erosion)
         self.ui.actionDilation.triggered.connect(self.dilation)
@@ -84,13 +88,33 @@ class Window(QMainWindow):
         self.ui.actionSquare.triggered.connect(self.square)
         self.ui.actionSkeletonize.triggered.connect(self.skeletonize)
         self.ui.actionFloodFill.triggered.connect(self.flood_fill)
-
+        #video
+        self.ui.actionWebCam.triggered.connect(self.canny_edge_webcam)
+        self.ui.actionVideo.triggered.connect(self.canny_edge_video)
+        
+    
+    # Load Image
     def load_image(self):
         print("load image clicked")
         file_name = QFileDialog.getOpenFileName(self, "Open File")
         self.image = cv2.imread(file_name[0])
         self.image_path = file_name[0]
         self.set_photo(self.image)
+        
+    # Save image
+    def save_image(self):
+        file_path = QFileDialog.getSaveFileName(self, "Save File", "", "*.jpg")
+        cv2.imwrite(file_path[0], self.processed)
+        print("saved")
+
+    def reset_image(self):
+        self.processed = self.image
+        self.set_photo(self.processed)
+        
+    def get_user_input(self, input_type):
+        dialog = QInputDialog.getInt(
+            self, "User Input", input_type, 0, 0, 1024, 1)
+        return dialog
 
     def set_photo(self, image):
         self.processed = image
@@ -113,15 +137,6 @@ class Window(QMainWindow):
 
         self.ui.image.installEventFilter(self)
 
-    # save image
-    def save_image(self):
-        file_path = QFileDialog.getSaveFileName(self, "Save File", "", "*.jpg")
-        cv2.imwrite(file_path[0], self.processed)
-        print("saved")
-
-    def reset_image(self):
-        self.processed = self.image
-        self.set_photo(self.processed)
 
     # Filters
     def laplacian_filter(self):
@@ -181,7 +196,9 @@ class Window(QMainWindow):
         kernel = np.ones((5, 5), 'uint8')
         result = cv2.dilate(self.processed, kernel, iterations=1)
         self.set_photo(result)
-
+    
+    
+    
     # Histograms
     def show_histogram(self):
         color = ('b', 'g', 'r')
@@ -196,12 +213,9 @@ class Window(QMainWindow):
         equalized = cv2.equalizeHist(image)
         res = np.hstack((image, equalized))  # stacking images side-by-side
         self.set_photo(res)
-
-    def get_user_input(self, input_type):
-        dialog = QInputDialog.getInt(
-            self, "User Input", input_type, 0, 0, 1024, 1)
-        return dialog
-
+    
+    
+    
     # Transforms
     def resize_image(self):
         width = int(self.get_user_input("width")[0])
@@ -238,8 +252,25 @@ class Window(QMainWindow):
         result = cv2.warpPerspective(
             self.processed, projective_matrix, (num_cols, num_rows))
         self.set_photo(result)
-
-    # morfolojik
+    
+    # Yogunluk Donusumu
+    
+    def negative(self):
+        negative = cv2.bitwise_not(self.processed)
+        self.set_photo(negative)
+    
+    def logarithmic(self):
+        logarithmic = (np.log(self.processed+1)/(np.log(1+np.max(self.processed))))*255
+        logarithmic = np.array(logarithmic,dtype=np.uint8)
+        self.set_photo(logarithmic)
+        
+    def powerlaw(self):
+        gamma = int(self.get_user_input("gamma")[0])
+        powerlaw = np.array(255*(self.processed / 255) ** gamma, dtype = 'uint8')
+        self.set_photo(powerlaw)
+    
+    
+    # Morfolojik
     def erosion(self):
         kernel = np.ones((5, 5), np.uint8)
         erosion = cv2.erode(self.processed, kernel, iterations=1)
@@ -319,6 +350,48 @@ class Window(QMainWindow):
         print("Number of elements: ", nelem)
 
         self.set_photo(image)
+        
+    
+    def canny_edge_webcam(self):
+        cap = cv2.VideoCapture(0)
+        while True:
+            ret, img = cap.read()
+            
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            blur = cv2.GaussianBlur(gray, (5, 5), 0)
+            canny = cv2.Canny(blur, 10, 70)
+            ret, mask = cv2.threshold(canny, 70, 255, cv2.THRESH_BINARY)
+            cv2.imshow('Webcam Canny Edge', mask)
+            
+            # Exit with Enter Button
+            if cv2.waitKey(1) == 13:
+                break
+        cap.release()
+        cv2.destroyAllWindows()
+        
+    def canny_edge_video(self):
+        cap = cv2.VideoCapture(QFileDialog.getOpenFileName(filter="Image (*.*)")[0])
+        frame_counter = 0
+        while True:
+            ret, img = cap.read()
+            frame_counter += 1
+            if frame_counter == cap.get(cv2.CAP_PROP_FRAME_COUNT):
+                frame_counter = 0 
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            
+            if (len(img.shape) == 3):
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            blur = cv2.GaussianBlur(gray, (5, 5), 0)
+            canny = cv2.Canny(blur, 10, 70)
+            ret, mask = cv2.threshold(canny, 70, 255, cv2.THRESH_BINARY)
+            cv2.imshow('Video Canny Edge', mask)
+            
+            # Exit with Enter Button
+            if cv2.waitKey(1) == 13:
+                break
+        cap.release()
+        cv2.destroyAllWindows()
+            
 
 
 def window():
